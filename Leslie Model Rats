@@ -1,0 +1,62 @@
+from numpy import linalg as np
+import numpy as num
+
+def print_2Dmatrix(A):
+    for x in A:
+        print(*x, sep="  ")
+
+if __name__ == '__main__':
+
+    #iterations of the model
+    generations = 10
+    
+    #number of age groups
+    age_groups = 21
+    
+    #Probability of survival to next generation 
+    prob_survival_vector = [0.94697,0.99665, 0.99926, 0.99899,
+        0.99863, 0.99817, 0.99753, 0.99667, 0.99553, 0.99399,
+        0.99196, 0.98926, 0.98572, 0.98107, 0.97511, 0.96748,
+        0.95797, 0.94631, 0.93247, 0.91649]
+        
+    fecundity_vector= [0, 0, 0.3964, 1.4939, 2.1777, 2.5250,
+        2.6282, 2.6749, 2.6018, 2.4419, 2.1865, 1.9044, 1.7259,
+        1.4918, 1.2415, 0.9522, 0.74141, 0.4618, 0.2518, 0.0901, 0.0035]
+    initial_population_vector = [37440, 22595, 14417, 9227, 5903,
+        3775, 2413, 1542, 984, 627, 399, 254, 161, 101, 64, 40, 25,
+        15, 9, 6, 3]
+
+    print(fecundity_vector)
+
+    Leslie_matrix= num.zeros([age_groups,age_groups])
+
+    for i in range(0,age_groups):
+        Leslie_matrix[0][i] = fecundity_vector[i]
+        if i > 0:
+            Leslie_matrix[i][i-1] = prob_survival_vector[i-1]
+    print("Leslie Matrix:")
+    print_2Dmatrix(Leslie_matrix)
+    print()
+
+    Population = num.zeros([generations + 1,age_groups])
+
+    First_iteration = []
+    First_iteration = num.matmul(Leslie_matrix, initial_population_vector)
+
+    for i in range(0,age_groups):
+        Population[0][i] = initial_population_vector[i]
+
+
+
+    iteration = []
+    current_population = Population[0]
+
+    for j in range(0, generations):
+        iteration = num.matmul(Leslie_matrix, current_population)
+
+        for k in range(0,age_groups):
+            Population[j+1][k] = int(round(iteration[k]))
+        current_population = Population[j+1]
+
+    print()
+    print_2Dmatrix(Population)
